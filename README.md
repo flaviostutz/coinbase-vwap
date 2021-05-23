@@ -16,6 +16,11 @@ The goal of this project is to implement a real-time vwap calculator from the Co
 * run `docker-compose -f docker-compose-withkafka.yml up --build`
 * program will be compiled, a Kafka broker will be run and the program will start vwap calculations while publishing the results to Kafka
 * open http://localhost:19000/topic/vwap-BTC-USD/messages to see published VWAP messages to Kafka Topic
+* If you really want to see topic messages being consumed from Kafka and displayed to the terminal, execute the following command in a separate terminal
+
+```sh
+docker exec $(docker ps | grep kafka | cut -d' ' -f1) /bin/sh -c '/opt/bitnami/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic vwap-BTC-USD --from-beginning'
+```
 
 ### Parameters
 
@@ -42,7 +47,7 @@ A potential bottleneck in our problem is the calculation of long windows in VWAP
 
 A regular implementation would have to iterate over all elements in the window twice in order to calculate both terms of the equation WAVG = SUM(V*W)/SUM(W) every time we need to calculate the resulting windows average, resulting in a complexity of O(2N) -> O(N).
 
-In our implementation, we chose to keep partial sums for both SUM(V*W) and SUM(W) by removing "expired" elements from its sum while adding new elements to the sum when adding a new sample to the window. This strategy reduces the "normal" complexity from O(N) to O(1).
+In our implementation, we chose to keep partial sums for both SUM(V*W) and SUM(W) by removing "expired" elements from its sum while adding new elements to the sum when adding a new sample to the window. This strategy reduces the "regular" complexity from **O(N) to O(1)**.
 
 ## Tests
 
