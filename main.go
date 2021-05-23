@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"os"
 
 	"github.com/flaviostutz/coinbase-vwap/coinbase"
 	"github.com/sirupsen/logrus"
@@ -41,11 +42,15 @@ func main() {
 
 	logrus.Infof("Online VWAP calculations:")
 	coinbase.CalculateVWAP(context.TODO(), mic, 200, func(vwap coinbase.VWAPInfo) {
-		fmt.Printf("VWAP 200 %s=%s\n", vwap.ProductId, vwap.Value.Text('f', 8))
+		fmt.Printf("VWAP-200 %s=%s\n", vwap.ProductId, vwap.Value.String())
 	})
 
 	for {
-		//wait until process is terminated
+		select {
+		case <-context.TODO().Done():
+			logrus.Debugf("Exiting...")
+			os.Exit(0)
+		}
 	}
 }
 
