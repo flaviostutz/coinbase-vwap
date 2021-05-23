@@ -10,19 +10,19 @@ import (
 )
 
 var (
-	topicWriters map[string]*kafka.Writer
 	brokers      []string
+	topicWriters map[string]*kafka.Writer
 )
-
-func init() {
-	topicWriters = make(map[string]*kafka.Writer)
-}
 
 func SetKafkaAddress(brokers_ []string) {
 	brokers = brokers_
 }
 
-func PublishVWAPToKafka(ctx context.Context, info coinbase.VWAPInfo) error {
+func init() {
+	topicWriters = make(map[string]*kafka.Writer)
+}
+
+func PublishVWAPToKafkaSegmentio(ctx context.Context, info coinbase.VWAPInfo) error {
 	if len(brokers) == 0 {
 		return fmt.Errorf("call SetKafkaAddress before calling Publish")
 	}
