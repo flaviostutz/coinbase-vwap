@@ -9,14 +9,14 @@ import (
 	"strings"
 
 	"github.com/flaviostutz/coinbase-vwap/coinbase"
-	"github.com/flaviostutz/coinbase-vwap/topics"
+	"github.com/flaviostutz/coinbase-vwap/kafka"
 	"github.com/sirupsen/logrus"
 )
 
 func main() {
 	logLevel := flag.String("loglevel", "debug", "debug, info, warning, error")
 	coinbaseWSURL := flag.String("coinbase-ws-url", "wss://ws-feed-public.sandbox.pro.coinbase.com", "Coinbase Websockets API endpoint URL. Defaults to sandbox URL")
-	kafkaAddress := flag.String("kafka-address", "", "Kafka broker address. ex.: kafka1:9092,kafka2:9092")
+	kafkaBrokers := flag.String("kafka-brokers", "", "Kafka broker addresses separated by comma. ex.: kafka1:9092,kafka2:9092")
 	flag.Parse()
 
 	switch *logLevel {
@@ -38,23 +38,25 @@ func main() {
 		return
 	}
 
+	ctx, cancel := context.WithCancel(context.TODO())
+
 	enableKafka := false
-	if *kafkaAddress != "" {
+	if *kafkaBrokers != "" {
 		enableKafka = true
-		topics.SetupKafkaProducer(strings.Split((*kafkaAddress), ","))
+		kafka.SetupKafkaProducer(ctx, strings.Split((*kafkaBrokers), ","))
 	}
 
 	logrus.Infof("====Starting coinbase-vwap====")
 
 	logrus.Infof("Connecting to Coinbase Matches Stream...")
 	mic := make(chan coinbase.MatchInfo)
-	coinbase.SubscribeMatchesChannel(context.TODO(), mic, *coinbaseWSURL, "BTC-USD", "ETH-BTC")
+	coinbase.SubscribeMatchesChannel(ctx, mic, *coinbaseWSURL, "BTC-USD", "ETH-BTC")
 
 	logrus.Infof("Online VWAP calculations:")
-	coinbase.CalculateVWAP(context.TODO(), mic, 200, func(vwap coinbase.VWAPInfo) {
-		fmt.Printf("VWAP-200 %s=%s\n", vwap.ProductId, vwap.Value.String())
+	coinbase.CalculateVWAP(ctx, mic, 200, func(vwap coinbase.VWAPInfo) {
+		fmt.Printf("VWAP-200 %s=%s\n\n", vwap.ProductId, vwap.Value.String())
 		if enableKafka {
-			err := topics.PublishVWAPToKafka(vwap)
+			err := kafka.PublishVWAPToKafka(vwap)
 			if err != nil {
 				logrus.Warnf("Error sending VWAP to Kafka topic. err=%s", err)
 			}
@@ -62,32 +64,13 @@ func main() {
 	})
 
 	signals := make(chan os.Signal, 1)
-	signal.Notify(signals, os.Interrupt)
+	signal.Notify(signals, os.Kill)
 	// for {
 	select {
 	case <-signals:
-		logrus.Infof("Terminating...")
+		logrus.Infof("Shuting down...")
+		cancel()
 		return
 	}
 	// }
 }
-
-// opt := handlers.Options{
-// 	WFSURL:        *wfsURL,
-// 	MongoDBName:   *mongoDBName0,
-// 	MongoAddress:  *mongoAddress0,
-// 	MongoUsername: *mongoUsername0,
-// 	MongoPassword: *mongoPassword0,
-// }
-
-// if opt.WFSURL == "" {
-// 	logrus.Errorf("'--wfs-url' is required")
-// 	os.Exit(1)
-// }
-
-// h := handlers.NewHTTPServer(opt)
-// err := h.Start()
-// if err != nil {
-// 	logrus.Errorf("Error starting server. err=%s", err)
-// 	os.Exit(1)
-// }

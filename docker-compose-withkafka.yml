@@ -7,7 +7,7 @@ services:
     image: flaviostutz/coinbase-vwap
     environment:
       - LOG_LEVEL=debug
-      - KAFKA_ADDRESS=kafka1:9092
+      - KAFKA_BROKERS=kafka1:9092
       # - COINBASE_WS_URL=
 
   zookeeper:
@@ -22,18 +22,18 @@ services:
       - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
       - ALLOW_PLAINTEXT_LISTENER=yes
       - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://127.0.0.1:9092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://kafka1:9092
       - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
 
-  kafka2:
-    image: bitnami/kafka:2.8.0
-    restart: always
-    environment:
-      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
-      - ALLOW_PLAINTEXT_LISTENER=yes
-      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
-      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://127.0.0.1:9092
-      - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
+  # kafka2:
+  #   image: bitnami/kafka:2.8.0
+  #   restart: always
+  #   environment:
+  #     - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+  #     - ALLOW_PLAINTEXT_LISTENER=yes
+  #     - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
+  #     - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://127.0.0.1:9092
+  #     - KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true
 
   kafdrop:
     image: obsidiandynamics/kafdrop:3.27.0

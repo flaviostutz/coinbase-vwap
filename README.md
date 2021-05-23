@@ -8,7 +8,14 @@ The goal of this project is to implement a real-time vwap calculator from the Co
 
 * git clone this repo to your workspace
 * run `docker-compose up --build`
-* all unit tests will be run, the program will be compiled and run with default parameters
+* all unit tests will be run, the program will be compiled and run with default parameters, outputing the latest VWAP to stdout for each ProductId "BTC-USD" and "ETH-BTC"
+
+### Run with Kafka support
+
+* git clone this repo to your workspace
+* run `docker-compose -f docker-compose-withkafka.yml up --build`
+* program will be compiled, a Kafka broker will be run and the program will start vwap calculations while publishing the results to Kafka
+* open http://localhost:19000/topic/vwap-BTC-USD/messages to see published VWAP messages to Kafka Topic
 
 ### Parameters
 

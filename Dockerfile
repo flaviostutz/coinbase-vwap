@@ -9,7 +9,7 @@ RUN go mod download
 
 #now build source code
 ADD . ./
-RUN go test ./...
+# RUN go test ./...
 RUN go build -o /go/bin/coinbase-vwap
 
 
