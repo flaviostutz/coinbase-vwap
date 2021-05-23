@@ -18,6 +18,7 @@ FROM golang:1.16.4
 
 ENV LOG_LEVEL 'info'
 ENV COINBASE_WS_URL 'wss://ws-feed-public.sandbox.pro.coinbase.com'
+ENV KAFKA_ADDRESS ''
 
 COPY --from=BUILD /go/bin/* /bin/
 ADD /startup.sh /

@@ -4,5 +4,7 @@ echo "Starting coinbase-vwap..."
 
 coinbase-vwap \
   --loglevel="$LOG_LEVEL" \
-  --coinbase-ws-url="$COINBASE_WS_URL"
+  --coinbase-ws-url="$COINBASE_WS_URL" \
+  --kafka-address="$KAFKA_ADDRESS"
+  
 

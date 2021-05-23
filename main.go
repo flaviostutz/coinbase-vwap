@@ -7,12 +7,14 @@ import (
 	"os"
 
 	"github.com/flaviostutz/coinbase-vwap/coinbase"
+	"github.com/flaviostutz/coinbase-vwap/topics"
 	"github.com/sirupsen/logrus"
 )
 
 func main() {
 	logLevel := flag.String("loglevel", "debug", "debug, info, warning, error")
 	coinbaseWSURL := flag.String("coinbase-ws-url", "wss://ws-feed-public.sandbox.pro.coinbase.com", "Coinbase Websockets API endpoint URL. Defaults to sandbox URL")
+	kafkaAddress := flag.String("kafka-address", "", "Kafka broker address. ex.: localhost:9092")
 	flag.Parse()
 
 	switch *logLevel {
@@ -34,6 +36,12 @@ func main() {
 		return
 	}
 
+	enableKafka := false
+	if *kafkaAddress != "" {
+		enableKafka = true
+		topics.SetKafkaAddress([]string{*kafkaAddress})
+	}
+
 	logrus.Infof("====Starting coinbase-vwap====")
 
 	logrus.Infof("Connecting to Coinbase Matches Stream...")
@@ -43,6 +51,12 @@ func main() {
 	logrus.Infof("Online VWAP calculations:")
 	coinbase.CalculateVWAP(context.TODO(), mic, 200, func(vwap coinbase.VWAPInfo) {
 		fmt.Printf("VWAP-200 %s=%s\n", vwap.ProductId, vwap.Value.String())
+		if enableKafka {
+			err := topics.PublishVWAPToKafka(context.TODO(), vwap)
+			if err != nil {
+				logrus.Warnf("Error sending VWAP to Kafka topic. err=%s", err)
+			}
+		}
 	})
 
 	for {
