@@ -43,7 +43,11 @@ func main() {
 	enableKafka := false
 	if *kafkaBrokers != "" {
 		enableKafka = true
-		kafka.SetupKafkaProducer(ctx, strings.Split((*kafkaBrokers), ","))
+		err := kafka.SetupKafkaProducer(ctx, strings.Split((*kafkaBrokers), ","))
+		if err != nil {
+			logrus.Errorf("Kafka is enabled but brokers are unreacheable. err=%s", err)
+			os.Exit(1)
+		}
 	}
 
 	logrus.Infof("====Starting coinbase-vwap====")

@@ -5,6 +5,7 @@ services:
   coinbase-vwap:
     build: .
     image: flaviostutz/coinbase-vwap
+    restart: always
     environment:
       - LOG_LEVEL=debug
       - KAFKA_BROKERS=kafka1:9092
