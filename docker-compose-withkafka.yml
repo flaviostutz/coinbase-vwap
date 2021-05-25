@@ -9,6 +9,7 @@ services:
     environment:
       - LOG_LEVEL=debug
       - KAFKA_BROKERS=kafka1:9092
+      - PRODUCT_IDS=BTC-USD,BTC-GBP,BTC-EUR,ETH-BTC
       # - COINBASE_WS_URL=
 
   zookeeper:

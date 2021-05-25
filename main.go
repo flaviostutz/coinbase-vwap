@@ -17,6 +17,7 @@ func main() {
 	logLevel := flag.String("loglevel", "debug", "debug, info, warning, error")
 	coinbaseWSURL := flag.String("coinbase-ws-url", "wss://ws-feed-public.sandbox.pro.coinbase.com", "Coinbase Websockets API endpoint URL. Defaults to sandbox URL")
 	kafkaBrokers := flag.String("kafka-brokers", "", "Kafka broker addresses separated by comma. ex.: kafka1:9092,kafka2:9092")
+	productIDs := flag.String("product-ids", "", "Comma separated list of product_id pairs. ex.: BTC-USD,BTC-GBP,BTC-EUR,ETH-BTC")
 	flag.Parse()
 
 	switch *logLevel {
@@ -38,6 +39,11 @@ func main() {
 		return
 	}
 
+	if *productIDs == "" {
+		logrus.Errorf("'product-ids' parameter cannot be empty")
+		return
+	}
+
 	ctx, cancel := context.WithCancel(context.TODO())
 
 	enableKafka := false
@@ -54,7 +60,7 @@ func main() {
 
 	logrus.Infof("Connecting to Coinbase Matches Stream...")
 	mic := make(chan coinbase.MatchInfo)
-	coinbase.SubscribeMatchesChannel(ctx, mic, *coinbaseWSURL, "BTC-USD", "ETH-BTC", "BTC-GBP", "BTC-EUR")
+	coinbase.SubscribeMatchesChannel(ctx, mic, *coinbaseWSURL, strings.Split(*productIDs, ",")...)
 
 	logrus.Infof("Online VWAP calculations:")
 	coinbase.CalculateVWAP(ctx, mic, 200, func(vwap coinbase.VWAPInfo) {

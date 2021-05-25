@@ -6,6 +6,7 @@ services:
     build: .
     image: flaviostutz/coinbase-vwap
     environment:
-      - LOG_LEVEL=debug
+      - LOG_LEVEL=info
+      - PRODUCT_IDS=BTC-USD,BTC-GBP,BTC-EUR,ETH-BTC
       # - COINBASE_WS_URL=
 
