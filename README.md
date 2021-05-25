@@ -2,6 +2,13 @@
 
 The goal of this project is to implement a real-time vwap calculator from the Coinbase match stream
 
+## Demo
+
+<img src="vwap-kafka.gif"/>
+
+* The window on top is the program itself calculating the VWAP values and sending to Kafka
+* The two windows below are a streaming of some Kafka topics to the console
+
 ## Usage
 
 ### Just run it
