@@ -2,6 +2,8 @@
 
 The goal of this project is to implement a real-time vwap calculator from the Coinbase match stream
 
+Check the Python version of this demo project at https://github.com/flaviostutz/coinbase-vwap-python
+
 ## Demo
 
 <img src="vwap-kafka.gif"/>
