@@ -54,7 +54,7 @@ func main() {
 
 	logrus.Infof("Connecting to Coinbase Matches Stream...")
 	mic := make(chan coinbase.MatchInfo)
-	coinbase.SubscribeMatchesChannel(ctx, mic, *coinbaseWSURL, "BTC-USD", "ETH-BTC")
+	coinbase.SubscribeMatchesChannel(ctx, mic, *coinbaseWSURL, "BTC-USD", "ETH-BTC", "BTC-GBP", "BTC-EUR")
 
 	logrus.Infof("Online VWAP calculations:")
 	coinbase.CalculateVWAP(ctx, mic, 200, func(vwap coinbase.VWAPInfo) {
